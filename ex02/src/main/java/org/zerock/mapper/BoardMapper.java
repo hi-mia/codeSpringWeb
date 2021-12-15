@@ -21,4 +21,6 @@ public interface BoardMapper {
 	public int delete(Long bno); //데이터가 삭제되면 1이상의 값 가짐, 해당 번호의 게시물 없다면 0을 가짐
 	
 	public int update(BoardVO board); //몇 개의 데이터가 수정되었는가
+	
+	public int getTotalCount(Criteria cri); 
 }

@@ -14,4 +14,6 @@ public interface BoardService {
 	
 	//Criteria를 파라미터로 처리
 	public List<BoardVO> getList(Criteria cri);
+	
+	public int getTotal(Criteria cri);
 }
