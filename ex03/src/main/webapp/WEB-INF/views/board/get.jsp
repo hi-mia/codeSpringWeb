@@ -144,7 +144,22 @@
 		
 <script type="text/javascript" src="/resources/js/reply.js"></script>
 <script>
-$(document).ready(function(){	
+$("#modalCloseBtn").on("click", function(){
+	$('#myModal').modal("hide"); //닫기 
+});
+
+$(document).ready(function(){
+	
+	//모달창 바깥 누르면 자동으로 닫힘
+	window.onclick = function(e) {
+		if(e.target == modal) {
+			modal.style.visibility = "hidden";
+			modal.style.opacity = 0;
+			
+		}
+		
+	}
+	
 	var bnoValue = '<c:out value = "${board.bno}"/>';
 	var replyUL = $(".chat");
 	

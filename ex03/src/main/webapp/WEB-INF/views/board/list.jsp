@@ -130,7 +130,7 @@
 			<form id='actionForm' action="/board/list" method='get'>
 				<input type='hidden' name='pageNum' value='${pageMaker.cri.pageNum}'>
 				<input type='hidden' name='amount' value='${pageMaker.cri.amount}'>
-
+				<input type="hidden" name="bno"  >
 				<input type='hidden' name='type'
 					value='<c:out value="${ pageMaker.cri.type }"/>'> <input
 					type='hidden' name='keyword'
@@ -152,10 +152,8 @@
 						</div>
 						<div class="modal-body">처리가 완료되었습니다.</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-default"
+							<button type="button" class="btn btn-default" id="modalCloseBtn"
 								data-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary">Save
-								changes</button>
 						</div>
 					</div>
 					<!-- /.modal-content -->
@@ -173,107 +171,95 @@
 </div>
 <!-- /.row -->
 
-
-
-
-
-
 <script type="text/javascript">
-	$(document)
-			.ready(
-					function() {
+$("#modalCloseBtn").on("click", function(){
+	$('#myModal').modal("hide"); //닫기 
+});
 
-						var result = '<c:out value="${result}"/>';
+	$(document).ready(function() {
+		
+		//모달창 바깥 누르면 자동으로 닫힘
+		window.onclick = function(e) {
+			if(e.target == modal) {
+				modal.style.visibility = "hidden";
+				modal.style.opacity = 0;
+				
+			}
+			
+		}
 
-						checkModal(result);
+		var result = '<c:out value="${result}"/>';
 
-						history.replaceState({}, null, null);
+		checkModal(result);
 
-						function checkModal(result) {
+		history.replaceState({}, null, null);
 
-							if (result === '' || history.state) {
-								return;
-							}
+		function checkModal(result) {
 
-							if (parseInt(result) > 0) {
-								$(".modal-body").html(
-										"게시글 " + parseInt(result)
-												+ " 번이 등록되었습니다.");
-							}
+			if (result === '' || history.state) {
+				return;
+			}
 
-							$("#myModal").modal("show");
-						}
+			if (parseInt(result) > 0) {
+				$(".modal-body").html("게시글 " + parseInt(result) + " 번이 등록되었습니다.");
+			}
 
-						$("#regBtn").on("click", function() {
+				$("#myModal").modal("show");
+			}
 
-							self.location = "/board/register";
+				$("#regBtn").on("click", function() {
+	
+				self.location = "/board/register";
 
-						});
+			});
+						
+				var actionForm = $("#actionForm");
 
-						var actionForm = $("#actionForm");
+				$(".paginate_button a").on("click", function(e) {
+					e.preventDefault();
+					e.stopPropagation();
 
-						$(".paginate_button a").on(
-								"click",
-								function(e) {
+					console.log('click');
 
-									e.preventDefault();
+					actionForm.attr("action","/board/list");
 
-									console.log('click');
+					actionForm.find("input[name='pageNum']").val($(this).attr("href"));
 
-									actionForm.find("input[name='pageNum']")
-											.val($(this).attr("href"));
-									actionForm.submit();
-								});
+					actionForm.submit(); 
+				});
 
-						$(".move")
-								.on(
-										"click",
-										function(e) {
+				$(".move").on("click", function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+//					actionForm.append("<input type='hidden' name='bno' value='"
+//							+ $(this).attr("href")+ "'>");
+					actionForm.find("input[name='bno']").val($(this).attr("href"));
+					actionForm.attr("action","/board/get");
+					actionForm.submit();
+				});
 
-											e.preventDefault();
-											actionForm
-													.append("<input type='hidden' name='bno' value='"
-															+ $(this).attr(
-																	"href")
-															+ "'>");
-											actionForm.attr("action",
-													"/board/get");
-											actionForm.submit();
+				var searchForm = $("#searchForm");
 
-										});
+				$("#searchForm button").on("click", function(e) {
+					if (!searchForm.find("option:selected").val()) {
+						alert("검색종류를 선택하세요");
+						return false;
+					}
 
-						var searchForm = $("#searchForm");
+					if (!searchForm.find("input[name='keyword']").val()) {
+						alert("키워드를 입력하세요");
+						return false;
+					}
 
-						$("#searchForm button").on(
-								"click",
-								function(e) {
+					searchForm.find("input[name='pageNum']").val("1");
+						e.preventDefault();
 
-									if (!searchForm.find("option:selected")
-											.val()) {
-										alert("검색종류를 선택하세요");
-										return false;
-									}
+						searchForm.submit();
 
-									if (!searchForm.find(
-											"input[name='keyword']").val()) {
-										alert("키워드를 입력하세요");
-										return false;
-									}
-
-									searchForm.find("input[name='pageNum']")
-											.val("1");
-									e.preventDefault();
-
-									searchForm.submit();
-
-								});
+					});
 
 					});
 </script>
-
-
-
-
 
 
 <%@include file="../includes/footer.jsp"%>
