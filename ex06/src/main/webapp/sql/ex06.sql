@@ -49,3 +49,11 @@ select
 from
     tbl_member_auth
 where userid = 'admin90';
+
+--스프링 시큐리티의 공식 문서에 나오는 로그인 정보를 유지하는 테이블
+create table persistent_logins(
+     username varchar(64) not null,
+     series varchar(64) primary key,
+     token varchar(64) not null,
+     last_used timestamp not null
+);
