@@ -37,3 +37,15 @@ create table tbl_member_auth( --권한
     constraint fk_member_auth foreign key(userid) references
 tbl_member(userid)
 );
+
+select
+    userid username, userpw password, enabled
+from
+    tbl_member
+where userid='admin90';
+
+select
+    userid username, auth authority
+from
+    tbl_member_auth
+where userid = 'admin90';
