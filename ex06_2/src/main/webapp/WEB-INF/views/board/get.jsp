@@ -254,6 +254,8 @@
       </div>
       <!-- /.modal -->
 
+
+
 <script type="text/javascript" src="/resources/js/reply.js"></script>
 
 <script>
@@ -299,6 +301,7 @@ $(document).ready(function () {
          replyUL.html(str);
          
          showReplyPage(replyCnt);
+
      
        });//end function
          
@@ -329,16 +332,23 @@ $(document).ready(function () {
         str+= "<li class='page-item'><a class='page-link' href='"+(startNum -1)+"'>Previous</a></li>";
       }
       
+       
+      
       for(var i = startNum ; i <= endNum; i++){
+        
         var active = pageNum == i? "active":"";
+        
         str+= "<li class='page-item "+active+" '><a class='page-link' href='"+i+"'>"+i+"</a></li>";
       }
       
       if(next){
         str+= "<li class='page-item'><a class='page-link' href='"+(endNum + 1)+"'>Next</a></li>";
       }
+      
       str += "</ul></div>";
+      
       console.log(str);
+      
       replyPageFooter.html(str);
     }
      
@@ -354,6 +364,32 @@ $(document).ready(function () {
         
         showList(pageNum);
       });     
+
+    
+/*     function showList(page){
+      
+      replyService.getList({bno:bnoValue,page: page|| 1 }, function(list) {
+        
+        var str="";
+       if(list == null || list.length == 0){
+        
+        replyUL.html("");
+        
+        return;
+      }
+       for (var i = 0, len = list.length || 0; i < len; i++) {
+           str +="<li class='left clearfix' data-rno='"+list[i].rno+"'>";
+           str +="  <div><div class='header'><strong class='primary-font'>"+list[i].replyer+"</strong>"; 
+           str +="    <small class='pull-right text-muted'>"+replyService.displayTime(list[i].replyDate)+"</small></div>";
+           str +="    <p>"+list[i].reply+"</p></div></li>";
+         }
+
+
+    replyUL.html(str);
+
+      });//end function
+      
+   }//end showList */
    
     var modal = $(".modal");
     var modalInputReply = modal.find("input[name='reply']");
@@ -433,6 +469,35 @@ $(document).ready(function () {
       });
     });
   
+    
+/*     modalModBtn.on("click", function(e){
+      
+      var reply = {rno:modal.data("rno"), reply: modalInputReply.val()};
+      
+      replyService.update(reply, function(result){
+            
+        alert(result);
+        modal.modal("hide");
+        showList(1);
+        
+      });
+      
+    });
+
+    modalRemoveBtn.on("click", function (e){
+    	  
+  	  var rno = modal.data("rno");
+  	  
+  	  replyService.remove(rno, function(result){
+  	        
+  	      alert(result);
+  	      modal.modal("hide");
+  	      showList(1);
+  	      
+  	  });
+  	  
+  	}); */
+
 modalModBtn.on("click", function(e){
 	
 	var originalReplyer = modalInputReplyer.val();
@@ -468,6 +533,24 @@ modalModBtn.on("click", function(e){
   
 });
 
+/* 
+   	modalRemoveBtn.on("click", function (e){
+   	  
+   	  var rno = modal.data("rno");
+   	  
+   	  replyService.remove(rno, function(result){
+   	        
+   	      alert(result);
+   	      modal.modal("hide");
+   	      showList(pageNum);
+   	      
+   	  });
+   	  
+   	}); */
+
+   	
+   	
+   	
    	modalRemoveBtn.on("click", function (e){
    	  
    	  var rno = modal.data("rno");
@@ -522,10 +605,6 @@ modalModBtn.on("click", function(e){
 
 </script>
 
-
-
-<script>
-
 <script type="text/javascript">
 $(document).ready(function() {
   
@@ -558,6 +637,12 @@ $(document).ready(function(){
   
     var bno = '<c:out value="${board.bno}"/>';
     
+    /* $.getJSON("/board/getAttachList", {bno: bno}, function(arr){
+    
+      console.log(arr);
+      
+      
+    }); *///end getjson
     $.getJSON("/board/getAttachList", {bno: bno}, function(arr){
         
        console.log(arr);
@@ -606,6 +691,7 @@ $(document).ready(function(){
       //download 
       self.location ="/download?fileName="+path
     }
+    
     
   });
   
