@@ -84,24 +84,28 @@ public class BoardController {
 	}
 
 
+	//수정 처리
+	@PreAuthorize("principal.username == #writer")
 	@PostMapping("/modify")
-	public String modify(BoardVO board, @ModelAttribute("cri") Criteria cri, RedirectAttributes rttr) {
+	public String modify(BoardVO board, Criteria cri, RedirectAttributes rttr) {
 		log.info("modify:" + board);
 
 		if (service.modify(board)) {
 			rttr.addFlashAttribute("result", "success");
 		}
+//		rttr.addAttribute("pageNum", cri.getPageNum());
+//		rttr.addAttribute("amount", cri.getAmount());
+//		rttr.addAttribute("type", cri.getType());
+//		rttr.addAttribute("keyword", cri.getKeyword());
 
-		rttr.addAttribute("pageNum", cri.getPageNum());
-		rttr.addAttribute("amount", cri.getAmount());
-		rttr.addAttribute("type", cri.getType());
-		rttr.addAttribute("keyword", cri.getKeyword());
-
-		return "redirect:/board/list";
+		return "redirect:/board/list" + cri.getListLink();
 	}
 
+	//삭제: 게시물 번호(bno) + 작성자(writer) 파라미터로 받음
+	@PreAuthorize("principal.username == #writer")
 	@PostMapping("/remove")
-	public String remove(@RequestParam("bno") Long bno, Criteria cri, RedirectAttributes rttr) {
+	public String remove(@RequestParam("bno") Long bno, Criteria cri, 
+						RedirectAttributes rttr, String writer) {
 
 		log.info("remove..." + bno);
 		
@@ -119,7 +123,7 @@ public class BoardController {
 //		rttr.addAttribute("type", cri.getType());
 //		rttr.addAttribute("keyword", cri.getKeyword());
 
-		return "redirect:/board/list";
+		return "redirect:/board/list" + cri.getListLink();
 	}
 
 //---------파일 첨부

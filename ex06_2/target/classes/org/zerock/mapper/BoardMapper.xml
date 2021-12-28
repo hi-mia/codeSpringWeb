@@ -85,6 +85,7 @@
   ]]>
   </select> -->
   
+  
 <select id="getListWithPaging" resultType="org.zerock.domain.BoardVO">
   <![CDATA[
   select 
@@ -118,12 +119,9 @@
   bno > 0  
   
   </select>
-
   
-<!-- 댓글 숫자 업데이트 -->  
-<update id="updateReplyCnt">
-	update tbl_board set replycnt = replycnt + #{amount} where bno = #{bno}
-</update>
-
+  <update id="updateReplyCnt">
+    update tbl_board set replycnt = replycnt + #{amount} where bno = #{bno}
+  </update>  
 
 </mapper>

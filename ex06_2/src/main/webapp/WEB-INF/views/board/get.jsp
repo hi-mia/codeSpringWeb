@@ -2,6 +2,8 @@
   pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+
 <%@include file="../includes/header.jsp"%>
 
 <style>
@@ -94,13 +96,14 @@
             value='<c:out value="${board.writer }"/>' readonly="readonly">
         </div>
 
-<%-- 		<button data-oper='modify' class="btn btn-default">
-        <a href="/board/modify?bno=<c:out value="${board.bno}"/>">Modify</a></button>
-        <button data-oper='list' class="btn btn-info">
-        <a href="/board/list">List</a></button> --%>
+<!-- <button data-oper='modify' class="btn btn-default">Modify</button> -->
+	<sec:authentication property="principal" var="pinfo"/>
+		<sec:authorize access="isAuthenticated()">
+		<c:if test="${pinfo.username eq board.writer }">
+		<button data-oper = 'modify' class="btn btn-default">Modify</button>
+		</c:if>
+		</sec:authorize>
 
-
-<button data-oper='modify' class="btn btn-default">Modify</button>
 <button data-oper='list' class="btn btn-info">List</button>
 
 <%-- <form id='operForm' action="/boad/modify" method="get">
@@ -165,7 +168,9 @@
       
       <div class="panel-heading">
         <i class="fa fa-comments fa-fw"></i> Reply
+        <sec:authorize access="isAuthenticated()">
         <button id='addReplyBtn' class='btn btn-primary btn-xs pull-right'>New Reply</button>
+      	</sec:authorize>
       </div>      
       
       <!-- /.panel-heading -->
@@ -411,15 +416,30 @@ $(document).ready(function(){
 	var modalRemoveBtn = $("#modalRemoveBtn");
 	var modalRegisterBtn = $("#modalRegisterBtn"); //modal과 관련된 객체들은 바깥으로 빼둔다(자주 쓰니까)
 	
+	var replyer = null;
+	<sec:authorize access = "isAuthenticated()">
+	replyer = '<sec:authentication property="principal.username"/>';
+	</sec:authorize>
+	
+	//CSRF 토큰 처리
+	var csrfHeaderName = "${_csrf.headerName}";
+	var csrfTokenValue = "${_csrf.token}";
+	
 	$("#addReplyBtn").on("click", function(e){
 		
 		modal.find("input").val("");
+		modal.find("input[name='replyer']").val(replyer);
 		modalInputReplyDate.closest("div").hide();
 		modal.find("button[id != 'modalCloseBtn']").hide();
 		
 		modalRegisterBtn.show(); //등록버튼 show
 		
 		$(".modal").modal("show");
+	});
+	
+	//Ajax spring security header...
+	$(document).ajaxSend(function(e, xhr, options){
+		xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
 	});
 	
 	//등록버튼 이벤트 처리
@@ -462,7 +482,26 @@ $(document).ready(function(){
 	});
 	
 	modalModBtn.on("click", function(e){
-		var reply = {rno:modal.data("rno"), reply: modalInputReply.val()};
+		var originalReplyer = modalInputReplyer.val();
+		
+		var reply = {
+				rno:modal.data("rno"), 
+				reply: modalInputReply.val()
+				replyer: originalReplyer};
+		
+		if(!replyer) {
+			alert("로그인 후 수정이 가능합니다.");
+			modal.modal("hide");
+			return;
+		}
+		
+		console.log("Original Replyer: " + originalReplyer);
+		
+		if(replyer != originalReplyer) {
+			alert("자신이 작성한 댓글만 수정이 가능합니다.");
+			modal.modal("hide");
+			return;
+		}
 		
 		replyService.update(reply, function(result){
 			
@@ -475,7 +514,26 @@ $(document).ready(function(){
 	modalRemoveBtn.on("click", function (e){
 		var rno = modal.data("rno");
 		
-		replyService.remove(rno, function(result){
+		console.log("RNO: " + rno);
+		console.log("REPLYER: " + replyer);
+		
+		//댓글 작성자와 로그인 사용자 비교해서 일치하면 댓글 삭제
+		if(!replyer) {
+			alert("로그인 후 삭제가 가능합니다.");
+			modal.modal("hide");
+			return;
+		}
+		
+		var originalReplyer = modalInputReplyer.val();
+		console.log("Original Replyer: " + originalReplyer); //댓글의 원래 작성자
+		
+		if(replyer != originalReplyer) {
+			alert("자신이 작성한 댓글만 삭제가 가능합니다.");
+			modal.modal("hide");
+			return;
+		}
+		
+		replyService.remove(rno, originalReplyer, function(result){
 			alert(result);
 			modal.modal("hide");
 			showList(pageNum);
